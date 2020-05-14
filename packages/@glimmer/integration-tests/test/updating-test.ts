@@ -1,6 +1,6 @@
 import { Option, HandleResult, ErrHandle, EncoderError } from '@glimmer/interfaces';
 import { ConstReference } from '@glimmer/reference';
-import { RenderTest, test, jitSuite, JitRenderDelegate, EmberishGlimmerComponent } from '..';
+import { RenderTest, test, jitSuite, JitRenderDelegate, EmberishCurlyComponent, EmberishGlimmerComponent } from '..';
 import { PrimitiveReference, SafeString } from '@glimmer/runtime';
 import {
   assertNodeTagName,
@@ -1860,6 +1860,43 @@ class UpdatingTest extends RenderTest {
       );
     }
     this.assertHTML('<ul><!----></ul>', 'After removing the remaining entries');
+  }
+
+  @test
+  '{{each}} items only update when arguments have changed'() {
+    let updateCount = 0;
+
+    this.registerComponent(
+      'Curly',
+      'UpdatableComponent',
+      '{{@item}}',
+      class extends EmberishCurlyComponent {
+        didUpdateAttrs() {
+          updateCount++;
+        }
+      }
+    );
+
+    this.render(
+      stripTight`
+        {{#each this.list as |item|}}
+          <UpdatableComponent @item={{item}}/>
+        {{/each}}
+      `,
+      {
+        list: ['initial'],
+      }
+    );
+
+    this.assertHTML('<div id="ember*" class="ember-view">initial</div>');
+
+    this.rerender({ list: ['initial', 'update'] });
+    this.assertHTML(stripTight`
+      <div id="ember*" class="ember-view">initial</div>
+      <div id="ember*" class="ember-view">update</div>
+    `);
+
+    assert.equal(updateCount, 0, 'update hook was not called');
   }
 
   @test
