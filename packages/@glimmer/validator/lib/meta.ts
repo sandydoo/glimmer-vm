@@ -8,7 +8,7 @@ import {
 } from './validators';
 import { assertTagNotConsumed } from './debug';
 
-export let propertyDidChange = function() {};
+export let propertyDidChange = function () { };
 
 export function setPropertyDidChange(cb: () => void) {
   propertyDidChange = cb;
@@ -33,6 +33,8 @@ export function dirtyTagFor<T>(obj: T, key: keyof T | string | symbol): void {
 
     // Dirty the tag for the specific property if it exists
     let propertyTag = tags.get(key);
+
+    console.log('Dirty tag', key, propertyTag, tags);
 
     if (propertyTag !== undefined) {
       if (DEBUG) {

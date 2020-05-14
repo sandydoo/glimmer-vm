@@ -19,7 +19,7 @@ export interface AbstractIterable<
   ItemType extends IterationItem<T, U>,
   ValueReferenceType extends PathReference<T>,
   MemoReferenceType extends PathReference<U>
-> {
+  > {
   tag: Tag;
   iterate(): AbstractIterator<T, U, ItemType>;
 
@@ -70,6 +70,9 @@ export class ListItem extends ListNode<OpaquePathReference> implements OpaqueIte
 
   update(item: OpaqueIterationItem) {
     this.retained = true;
+
+    console.log('Update ListItem', this.iterable, this.value, item);
+
     this.iterable.updateValueReference(this.value, item);
     this.iterable.updateMemoReference(this.memo, item);
   }
@@ -337,6 +340,8 @@ export class IteratorSynchronizer<Env> {
     let { artifacts } = this;
 
     // current = expect(current, 'BUG: current is empty');
+
+    console.log('NextRetain', current, item);
 
     current.update(item);
     this.current = artifacts.nextNode(current);

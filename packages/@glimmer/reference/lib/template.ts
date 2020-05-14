@@ -81,7 +81,7 @@ export abstract class RootReference<T = unknown> implements TemplatePathReferenc
 
   tag: Tag = CONSTANT_TAG;
 
-  constructor(protected env: TemplateReferenceEnvironment) {}
+  constructor(protected env: TemplateReferenceEnvironment) { }
 
   abstract value(): T;
 
@@ -297,6 +297,7 @@ export class IterationItemReference<T = unknown> implements TemplatePathReferenc
     itemKey: unknown,
     private env: TemplateReferenceEnvironment
   ) {
+    console.log('Creating IterationItemReference', itemValue);
     if (DEBUG) {
       env.setTemplatePathDebugContext(this, debugToString!(itemKey), parentReference);
     }
@@ -307,7 +308,16 @@ export class IterationItemReference<T = unknown> implements TemplatePathReferenc
   }
 
   update(value: T) {
-    dirtyTag(this.tag);
+    console.log('Has the value changed?', value !== this.itemValue, value, this.itemValue, this.tag);
+
+    if (value === this.itemValue) {
+      console.warn('Should have skipped the update! Values equal!');
+      // return;
+    }
+
+    console.log('Setting itemValue', value, this.itemValue);
+
+    dirtyTag(this.tag); // No bueno
     this.itemValue = value;
   }
 
